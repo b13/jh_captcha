@@ -1,18 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Haffner\JhCaptcha\Validation\Validator;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ReCaptchaValidator extends AbstractCaptchaValidator
 {
-    /**
-     * Check if $value is valid. If it is not valid, needs to add an error
-     * to Result.
-     *
-     * @param mixed $value
-     */
-    protected function isValid($value)
+    protected function isValid(mixed $value): void
     {
         if ($this->settings['reCaptcha']['version'] == 2) {
             $secret = htmlspecialchars($this->settings['reCaptcha']['v2']['secretKey']);
@@ -26,7 +22,7 @@ class ReCaptchaValidator extends AbstractCaptchaValidator
             true
         );
 
-        if ($apiResponse['success'] == false) {
+        if ($apiResponse['success'] === false) {
             if (is_array($apiResponse['error-codes'])) {
                 foreach ($apiResponse['error-codes'] as $errorCode) {
                     switch ($errorCode) {

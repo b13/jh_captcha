@@ -1,39 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Haffner\JhCaptcha\ViewHelpers;
 
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Utility\LocalizationUtility;
+use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper;
 
-class ReCaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractViewHelper
+class ReCaptchaViewHelper extends AbstractViewHelper
 {
     /**
-     * As this ViewHelper renders HTML, the output must not be escaped.
-     *
      * @var bool
      */
     protected $escapeOutput = false;
 
-    /**
-     * @var ConfigurationManagerInterface
-     */
-    protected $configurationManager;
-
-    /**
-     * @param ConfigurationManagerInterface $configurationManager
-     */
-    public function injectConfigurationManager(ConfigurationManagerInterface $configurationManager)
-    {
-        $this->configurationManager = $configurationManager;
+    public function __construct(
+        protected ConfigurationManagerInterface $configurationManager
+    ) {
     }
 
-    public function initializeArguments()
+    public function initializeArguments(): void
     {
         $this->registerArgument('uid', 'String', 'reCaptcha uid', false);
         $this->registerArgument('type', 'String', 'form type', false);
     }
 
-    public function render()
+    public function render(): string
     {
         $settings = $this->configurationManager->getConfiguration(
             ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS,
@@ -62,12 +55,13 @@ class ReCaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractView
         }
     }
 
-    private function renderV2($captchaResponseId, $settings)
+    private function renderV2($captchaResponseId, $settings): string
     {
         $siteKey = htmlspecialchars($settings['reCaptcha']['v2']['siteKey']);
         $theme = htmlspecialchars($settings['reCaptcha']['v2']['theme']);
         $lang = htmlspecialchars($settings['reCaptcha']['v2']['lang']);
         $size = htmlspecialchars($settings['reCaptcha']['v2']['size']);
+        $callBack = '';
 
         $reCaptcha = '<div id="recaptcha' . $this->arguments['uid'] . '"></div>';
         $renderReCaptcha = '<script type="text/javascript">var apiCallback' . str_replace("-", "", $this->arguments['uid']) . ' = function() { reCaptchaWidget' . str_replace("-", "", $this->arguments['uid']) . ' = grecaptcha.render("recaptcha' . $this->arguments['uid'] . '", { "sitekey" : "' . $siteKey .'", "callback" : "captchaCallback' . str_replace("-", "", $this->arguments['uid']) .'", "theme" : "' . $theme . '", "size" : "' . $size . '" }); }</script>';
@@ -79,7 +73,7 @@ class ReCaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractView
         return $reCaptcha . $callBack . $renderReCaptcha . $reCaptchaApi;
     }
 
-    private function renderV3($captchaResponseId, $settings)
+    private function renderV3($captchaResponseId, $settings): string
     {
         $callBackFunctionName = 'onLoad' .
             $this->arguments['type'] . str_replace("-", "", $this->arguments['uid']);
@@ -110,11 +104,8 @@ class ReCaptchaViewHelper extends \TYPO3Fluid\Fluid\Core\ViewHelper\AbstractView
         return $captchaResponseField . $callBack . $api;
     }
 
-    /**
-     * @return bool
-     */
-    private function isPowermail()
+    private function isPowermail(): bool
     {
-        return ($this->arguments['type'] == "powermail" ? true : false);
+        return $this->arguments['type'] === "powermail";
     }
 }

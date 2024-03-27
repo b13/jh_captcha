@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Haffner\JhCaptcha\Validation\Validator;
 
 use In2code\Powermail\Domain\Model\Field;
