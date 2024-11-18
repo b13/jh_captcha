@@ -63,11 +63,13 @@ class ReCaptchaViewHelper extends AbstractViewHelper
         $size = htmlspecialchars($settings['reCaptcha']['v2']['size']);
         $callBack = '';
 
-        $reCaptcha = '<div id="recaptcha' . $this->arguments['uid'] . '"></div>';
-        $renderReCaptcha = '<script type="text/javascript">var apiCallback' . str_replace("-", "", $this->arguments['uid']) . ' = function() { reCaptchaWidget' . str_replace("-", "", $this->arguments['uid']) . ' = grecaptcha.render("recaptcha' . $this->arguments['uid'] . '", { "sitekey" : "' . $siteKey .'", "callback" : "captchaCallback' . str_replace("-", "", $this->arguments['uid']) .'", "theme" : "' . $theme . '", "size" : "' . $size . '" }); }</script>';
-        $reCaptchaApi = '<script src="https://www.google.com/recaptcha/api.js?onload=apiCallback' . str_replace("-", "", $this->arguments['uid']) . '&hl=' . $lang . '&render=explicit" async defer></script>';
+        $uid = (string)$this->arguments['uid'];
+
+        $reCaptcha = '<div id="recaptcha' . $uid . '"></div>';
+        $renderReCaptcha = '<script type="text/javascript">var apiCallback' . str_replace("-", "", $uid) . ' = function() { reCaptchaWidget' . str_replace("-", "", $uid) . ' = grecaptcha.render("recaptcha' . $uid . '", { "sitekey" : "' . $siteKey .'", "callback" : "captchaCallback' . str_replace("-", "", $uid) .'", "theme" : "' . $theme . '", "size" : "' . $size . '" }); }</script>';
+        $reCaptchaApi = '<script src="https://www.google.com/recaptcha/api.js?onload=apiCallback' . str_replace("-", "", $uid) . '&hl=' . $lang . '&render=explicit" async defer></script>';
         if (!$this->isPowermail()) {
-            $callBack = '<script type="text/javascript">var captchaCallback' . str_replace("-", "", $this->arguments['uid']) . ' = function() { document.getElementById("' . $captchaResponseId . '").value = grecaptcha.getResponse(reCaptchaWidget' . str_replace("-", "", $this->arguments['uid']) . ') }</script>';
+            $callBack = '<script type="text/javascript">var captchaCallback' . str_replace("-", "", $uid) . ' = function() { document.getElementById("' . $captchaResponseId . '").value = grecaptcha.getResponse(reCaptchaWidget' . str_replace("-", "", $uid) . ') }</script>';
         }
 
         return $reCaptcha . $callBack . $renderReCaptcha . $reCaptchaApi;
