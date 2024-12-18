@@ -17,7 +17,7 @@ class Powermail extends \In2code\Powermail\Domain\Validator\SpamShield\AbstractM
         # Skip captcha check on confirmation page
         if (
             property_exists($this, 'flexForm')
-                && GeneralUtility::_GPmerged('tx_powermail_pi1')['action'] === 'create'
+                && in_array(GeneralUtility::_GPmerged('tx_powermail_pi1')['action'], ['create', 'checkCreate'])
                 && $this->flexForm['settings']['flexform']['main']['confirmation'] === '1'
         ) {
             return false;
